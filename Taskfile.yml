@@ -1,0 +1,9 @@
+version: '2'
+
+tasks:
+  build:
+    cmds:
+      - scripts/build.sh
+  version:
+    cmds:
+      - scripts/version.sh
