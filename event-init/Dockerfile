@@ -1,6 +1,6 @@
 FROM ubuntu:18.04
 
-ENV KUBECTL_VERSION=1.13.0
+ARG KUBECTL_VERSION=1.13.0
 
 RUN apt update \
   && apt install -y jq curl \
