@@ -1,9 +1,9 @@
 FROM ubuntu:18.04
 
-ENV KUBECTL_VERSION=1.13.0
+ARG KUBECTL_VERSION=1.13.0
 
 RUN apt update \
-  && apt install -y jq curl \
+  && apt install -y git jq curl \
   && rm -rf /var/lib/apt/lists/*
 
 RUN curl -L -O https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl \
