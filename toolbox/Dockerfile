@@ -27,6 +27,8 @@ RUN curl -L -O https://releases.hashicorp.com/consul-template/${CONSUL_TEMPLATE_
   && tar zxvf consul-template_${CONSUL_TEMPLATE_VERSION}_linux_amd64.tgz \
   && install -o root -g root -m 755 consul-template /usr/local/bin/consul-template
 
+COPY scripts/* /usr/local/bin/
+
 #######################################
 
 FROM golang:1.11

@@ -1,0 +1,8 @@
+#!/bin/bash
+
+set -e
+set -o pipefail
+
+for command in "$@"; do
+  eval ${command}
+done
