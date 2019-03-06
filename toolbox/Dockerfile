@@ -2,10 +2,11 @@ FROM golang:1.11 AS builder
 
 ENV GITHUB_RELEASE_VERSION=0.7.2 \
     GIT_CHLOG_VERSION=0.7.1 \
-    CONSUL_TEMPLATE_VERSION=0.19.5
+    CONSUL_TEMPLATE_VERSION=0.19.5 \
+    HUB_VERSION=2.10.0
 
 RUN apt update \
-  && apt install -y bzip2 jq hub \
+  && apt install -y bzip2 jq \
   && rm -rf /var/lib/apt/lists/*
 
 # go-task
@@ -26,6 +27,11 @@ RUN curl -L -O https://github.com/git-chglog/git-chglog/releases/download/${GIT_
 RUN curl -L -O https://releases.hashicorp.com/consul-template/${CONSUL_TEMPLATE_VERSION}/consul-template_${CONSUL_TEMPLATE_VERSION}_linux_amd64.tgz \
   && tar zxvf consul-template_${CONSUL_TEMPLATE_VERSION}_linux_amd64.tgz \
   && install -o root -g root -m 755 consul-template /usr/local/bin/consul-template
+
+# hub
+RUN curl -L -O https://github.com/github/hub/releases/download/v${HUB_VERSION}/hub-linux-amd64-${HUB_VERSION}.tgz \
+  && tar zxvf hub-linux-amd64-${HUB_VERSION}.tgz \
+  && install -o root -g root -m 755 hub-linux-amd64-${HUB_VERSION}/bin/hub /usr/local/bin/hub
 
 COPY scripts/* /usr/local/bin/
 
