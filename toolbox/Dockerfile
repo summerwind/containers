@@ -5,7 +5,7 @@ ENV GITHUB_RELEASE_VERSION=0.7.2 \
     CONSUL_TEMPLATE_VERSION=0.19.5
 
 RUN apt update \
-  && apt install -y bzip2 \
+  && apt install -y bzip2 jq hub \
   && rm -rf /var/lib/apt/lists/*
 
 # go-task
