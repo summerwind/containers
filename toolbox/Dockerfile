@@ -1,4 +1,4 @@
-FROM golang:1.11 AS builder
+FROM golang:1.12 AS builder
 
 ENV GITHUB_RELEASE_VERSION=0.7.2 \
     GIT_CHLOG_VERSION=0.7.1 \
@@ -37,7 +37,7 @@ COPY scripts/* /usr/local/bin/
 
 #######################################
 
-FROM golang:1.11
+FROM golang:1.12
 
 ENV GO111MODULE=on
 
