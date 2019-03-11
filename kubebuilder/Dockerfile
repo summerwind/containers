@@ -1,4 +1,4 @@
-FROM golang:1.11 AS builder
+FROM golang:1.12 AS builder
 
 ARG VERSION
 
@@ -17,7 +17,7 @@ RUN curl -L -O https://github.com/kubernetes-sigs/kustomize/releases/download/v$
 
 #######################################
 
-FROM golang:1.11
+FROM golang:1.12
 
 ENV PATH=/usr/local/kubebuilder/bin:$PATH
 
