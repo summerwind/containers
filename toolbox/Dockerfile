@@ -6,7 +6,7 @@ ENV GITHUB_RELEASE_VERSION=0.7.2 \
     HUB_VERSION=2.10.0
 
 RUN apt update \
-  && apt install -y bzip2 jq \
+  && apt install -y bzip2 \
   && rm -rf /var/lib/apt/lists/*
 
 # go-task
@@ -40,5 +40,9 @@ COPY scripts/* /usr/local/bin/
 FROM golang:1.12
 
 ENV GO111MODULE=on
+
+RUN apt update \
+  && apt install -y git jq zip bzip2 ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /usr/local/bin /usr/local/bin
