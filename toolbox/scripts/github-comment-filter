@@ -1,0 +1,61 @@
+#!/bin/bash
+
+set -e
+set -o pipefail
+
+usage() {
+  echo "Usage: $0 [-a action] [-u user] [-c comment] [-p event_path] "
+  exit 1
+}
+
+while getopts "a:u:c:p:h" OPT
+do
+  case $OPT in
+    "a") FILTER_ACTION=${OPTARG} ;;
+    "u") FILTER_USER=${OPTARG} ;;
+    "c") FILTER_COMMENT=${OPTARG} ;;
+    "p") EVENT_PATH=${OPTARG} ;;
+    "h") usage ;;
+  esac
+done
+
+if [ -z "${FILTER_COMMENT}" ]; then
+  echo "comment must be specified."
+  exit 1
+fi
+
+if [ -z "${EVENT_PATH}" ]; then
+  EVENT_PATH=/workspace/.event
+fi
+
+if [ -z "${FILTER_ACTION}" ]; then
+  FILTER_ACTION="created"
+fi
+
+GITHUB_ACTION=`cat ${EVENT_PATH}/data | jq -r .action`
+GITHUB_USER=`cat ${EVENT_PATH}/data | jq -r .comment.user.login`
+GITHUB_COMMENT=`cat ${EVENT_PATH}/data | jq -r .comment.body`
+
+if [ -z "${GITHUB_COMMENT}" ]; then
+  echo "Invalid payload."
+  exit 1
+fi
+
+echo "Action: ${GITHUB_ACTION}"
+echo "User: ${GITHUB_USER}"
+echo "Ccomment: ${GITHUB_COMMENT}"
+
+if [ "${FILTER_ACTION}" != "${GITHUB_ACTION}" ]; then
+  echo "Action is not matched."
+  exit 78
+fi
+
+if [ ! -z "${FILTER_USER}" ] && [ "${FILTER_USER}" != "${GITHUB_USER}" ]; then
+  echo "User is not matched."
+  exit 78
+fi
+
+if [ "${FILTER_COMMENT}" != "${GITHUB_COMMENT}" ]; then
+  echo "Comment is not matched."
+  exit 78
+fi

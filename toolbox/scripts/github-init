@@ -1,0 +1,51 @@
+#!/bin/bash
+
+set -e
+set -o pipefail
+
+usage() {
+  echo "Usage: $0 [-p event_path]"
+  exit 1
+}
+
+while getopts "p:h" OPT
+do
+  case $OPT in
+    "p") EVENT_PATH=${OPTARG} ;;
+    "h") usage ;;
+  esac
+done
+
+if [ -z "${EVENT_PATH}" ]; then
+  EVENT_PATH=/workspace/.event
+fi
+
+GITHUB_REF=`cat ${EVENT_PATH}/data | jq -r .ref`
+GITHUB_COMMIT=`cat ${EVENT_PATH}/data | jq -r .head_commit.id`
+GITHUB_REPO_URL=`cat ${EVENT_PATH}/data | jq -r .repository.clone_url`
+
+if [ -z "${GITHUB_REF}" ]; then
+  echo "Invalid payload."
+  exit 1
+fi
+
+echo "URL: ${GITHUB_REPO_URL}"
+echo "Ref: ${GITHUB_REF}"
+echo "Commit: ${GITHUB_COMMIT}"
+
+# Initialize repository
+git init
+git remote add origin "${GITHUB_REPO_URL}"
+
+# Checkout
+if [ `echo "${GITHUB_REF}" | grep 'refs/tags/'` ]; then
+  git fetch --tags origin "+${GITHUB_REF}:"
+  git checkout -qf FETCH_HEAD
+else
+  git fetch --no-tags origin "+${GITHUB_REF}:"
+  git reset --hard -q "${GITHUB_COMMIT}"
+fi
+
+# Initialize submodules
+git submodule update --init --recursive
+

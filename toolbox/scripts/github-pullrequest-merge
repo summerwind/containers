@@ -1,0 +1,50 @@
+#!/bin/bash
+
+set -e
+set -o pipefail
+
+usage() {
+  echo "Usage: $0 [-p event_path]"
+  exit 1
+}
+
+while getopts "p:h" OPT
+do
+  case $OPT in
+    "p") EVENT_PATH=${OPTARG} ;;
+    "h") usage ;;
+  esac
+done
+
+if [ -z "${EVENT_PATH}" ]; then
+  EVENT_PATH=/workspace/.event
+fi
+
+GITHUB_PR_URL=`cat ${EVENT_PATH}/data | jq -r .issue.html_url`
+
+if [ -z "${GITHUB_PR_URL}" ]; then
+  echo "Invalid payload."
+  exit 1
+fi
+
+echo "Pull Request URL: ${GITHUB_PR_URL}"
+
+# Checkout PR
+hub checkout ${GITHUB_PR_URL}
+
+# Check fixup commit
+if git log --oneline master..HEAD | grep "fixup\!"; then
+  echo "This branch contains a fixup commit. Let's rebase and push!"
+  git rebase --autosquash origin/master
+  git push -f
+fi
+
+# Pull master
+hub checkout master
+hub pull
+
+# Merge PR
+hub merge ${GITHUB_PR_URL}
+
+# Push merge commit to master
+hub push
