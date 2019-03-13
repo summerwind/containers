@@ -20,11 +20,11 @@ if [ -z "${EVENT_PATH}" ]; then
   EVENT_PATH=/workspace/.event
 fi
 
-GITHUB_REF=`cat ${EVENT_PATH}/data | jq -r .ref`
-GITHUB_COMMIT=`cat ${EVENT_PATH}/data | jq -r .head_commit.id`
-GITHUB_REPO_URL=`cat ${EVENT_PATH}/data | jq -r .repository.clone_url`
+GITHUB_REPO_URL=`cat ${EVENT_PATH}/data | jq -r '.repository.clone_url | select(.!=null)'`
+GITHUB_REF=`cat ${EVENT_PATH}/data | jq -r '.ref | select(.!=null)'`
+GITHUB_COMMIT=`cat ${EVENT_PATH}/data | jq -r '.head_commit.id | select(.!=null)'`
 
-if [ -z "${GITHUB_REF}" ]; then
+if [ -z "${GITHUB_REPO_URL}" ]; then
   echo "Invalid payload."
   exit 1
 fi
@@ -38,7 +38,10 @@ git init
 git remote add origin "${GITHUB_REPO_URL}"
 
 # Checkout
-if [ `echo "${GITHUB_REF}" | grep 'refs/tags/'` ]; then
+if [ -z "${GITHUB_REF}" ]; then
+  git fetch
+  git checkout -qf master
+elif echo "${GITHUB_REF}" | grep "refs/tags/"; then
   git fetch --tags origin "+${GITHUB_REF}:"
   git checkout -qf FETCH_HEAD
 else

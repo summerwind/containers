@@ -32,9 +32,9 @@ if [ -z "${FILTER_ACTION}" ]; then
   FILTER_ACTION="created"
 fi
 
-GITHUB_ACTION=`cat ${EVENT_PATH}/data | jq -r .action`
-GITHUB_USER=`cat ${EVENT_PATH}/data | jq -r .comment.user.login`
-GITHUB_COMMENT=`cat ${EVENT_PATH}/data | jq -r .comment.body`
+GITHUB_ACTION=`cat ${EVENT_PATH}/data | jq -r '.action | select(.!=null)'`
+GITHUB_USER=`cat ${EVENT_PATH}/data | jq -r '.comment.user.login | select(.!=null)'`
+GITHUB_COMMENT=`cat ${EVENT_PATH}/data | jq -r '.comment.body | select(.!=null)'`
 
 if [ -z "${GITHUB_COMMENT}" ]; then
   echo "Invalid payload."
@@ -43,7 +43,7 @@ fi
 
 echo "Action: ${GITHUB_ACTION}"
 echo "User: ${GITHUB_USER}"
-echo "Ccomment: ${GITHUB_COMMENT}"
+echo "Comment: ${GITHUB_COMMENT}"
 
 if [ "${FILTER_ACTION}" != "${GITHUB_ACTION}" ]; then
   echo "Action is not matched."

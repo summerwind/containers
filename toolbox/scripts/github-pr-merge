@@ -8,19 +8,26 @@ usage() {
   exit 1
 }
 
-while getopts "p:h" OPT
+while getopts "u:e:p:h" OPT
 do
   case $OPT in
+    "u") GIT_USER=${OPTARG} ;;
+    "e") GIT_EMAIL=${OPTARG} ;;
     "p") EVENT_PATH=${OPTARG} ;;
     "h") usage ;;
   esac
 done
 
+if [ -z "${GIT_USER}" ] || [ -z "${GIT_EMAIL}" ]; then
+  echo "User and Email must be specified."
+  exit 1
+fi
+
 if [ -z "${EVENT_PATH}" ]; then
   EVENT_PATH=/workspace/.event
 fi
 
-GITHUB_PR_URL=`cat ${EVENT_PATH}/data | jq -r .issue.html_url`
+GITHUB_PR_URL=`cat ${EVENT_PATH}/data | jq -r '.issue.html_url | select(.!=null)'`
 
 if [ -z "${GITHUB_PR_URL}" ]; then
   echo "Invalid payload."
@@ -29,13 +36,20 @@ fi
 
 echo "Pull Request URL: ${GITHUB_PR_URL}"
 
+# Set user
+git config user.name "${GIT_USER}"
+git config user.email "${GIT_EMAIL}"
+
 # Checkout PR
 hub checkout ${GITHUB_PR_URL}
+
+# Keep branch name
+BRANCH=`git rev-parse --abbrev-ref HEAD`
 
 # Check fixup commit
 if git log --oneline master..HEAD | grep "fixup\!"; then
   echo "This branch contains a fixup commit. Let's rebase and push!"
-  git rebase --autosquash origin/master
+  EDITOR=true git rebase -i --autosquash origin/master
   git push -f
 fi
 
@@ -48,3 +62,6 @@ hub merge ${GITHUB_PR_URL}
 
 # Push merge commit to master
 hub push
+
+# Delete branch
+hub push --delete origin ${BRANCH}
