@@ -51,7 +51,8 @@ COPY scripts/* /usr/local/bin/
 
 FROM golang:1.12
 
-ENV GO111MODULE=on
+ENV GO111MODULE=on \
+    DOCKER_BUILDKIT=1
 
 RUN apt update \
   && apt install -y git jq zip bzip2 ca-certificates \
