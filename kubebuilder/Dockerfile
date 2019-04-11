@@ -15,6 +15,12 @@ RUN curl -L -O https://github.com/golang/dep/releases/download/v${DEP_VERSION}/d
 RUN curl -L -O https://github.com/kubernetes-sigs/kustomize/releases/download/v${KUSTOMIZE_VERSION}/kustomize_${KUSTOMIZE_VERSION}_linux_amd64 \
   && install -o root -g root -m 755 kustomize_${KUSTOMIZE_VERSION}_linux_amd64 /usr/local/bin/kustomize
 
+RUN go get sigs.k8s.io/controller-tools/cmd/controller-gen \
+  && install -o root -g root -m 755 ${GOPATH}/bin/controller-gen /usr/local/bin/controller-gen
+
+RUN go get k8s.io/code-generator/cmd/deepcopy-gen \
+  && install -o root -g root -m 755 ${GOPATH}/bin/deepcopy-gen /usr/local/bin/deepcopy-gen
+
 #######################################
 
 FROM golang:1.12
