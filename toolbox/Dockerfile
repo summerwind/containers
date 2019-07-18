@@ -52,6 +52,7 @@ COPY scripts/* /usr/local/bin/
 FROM golang:1.12
 
 ENV GO111MODULE=on \
+    GOPROXY=https://proxy.golang.org \
     DOCKER_BUILDKIT=1
 
 RUN apt update \
