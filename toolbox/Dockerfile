@@ -1,9 +1,9 @@
 FROM golang:1.13 AS builder
 
-ENV DOCKER_VERSION=18.09.4 \
+ENV DOCKER_VERSION=19.03.2 \
     GITHUB_RELEASE_VERSION=0.7.2 \
-    GIT_CHLOG_VERSION=0.7.1 \
-    GHR_VERSION=0.12.0 \
+    GIT_CHLOG_VERSION=0.8.0 \
+    GHR_VERSION=0.12.2 \
     CONSUL_TEMPLATE_VERSION=0.19.5 \
     HUB_VERSION=2.10.0
 
@@ -58,7 +58,8 @@ COPY scripts/* /usr/local/bin/
 FROM golang:1.13
 
 ENV GO111MODULE=on \
-    DOCKER_BUILDKIT=1
+    DOCKER_BUILDKIT=1 \
+    DOCKER_CLI_EXPERIMENTAL=enable
 
 RUN apt update \
   && apt install -y git jq zip bzip2 ca-certificates \
