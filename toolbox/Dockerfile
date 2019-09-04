@@ -1,4 +1,4 @@
-FROM golang:1.12 AS builder
+FROM golang:1.13 AS builder
 
 ENV DOCKER_VERSION=18.09.4 \
     GITHUB_RELEASE_VERSION=0.7.2 \
@@ -55,10 +55,9 @@ COPY scripts/* /usr/local/bin/
 
 #######################################
 
-FROM golang:1.12
+FROM golang:1.13
 
 ENV GO111MODULE=on \
-    GOPROXY=https://proxy.golang.org \
     DOCKER_BUILDKIT=1
 
 RUN apt update \
