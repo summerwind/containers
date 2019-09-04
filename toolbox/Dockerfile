@@ -45,6 +45,12 @@ RUN curl -L -O https://github.com/github/hub/releases/download/v${HUB_VERSION}/h
   && tar zxvf hub-linux-amd64-${HUB_VERSION}.tgz \
   && install -o root -g root -m 755 hub-linux-amd64-${HUB_VERSION}/bin/hub /usr/local/bin/hub
 
+# testing framework
+RUN curl -L -o /tmp/download-binaries.sh https://raw.githubusercontent.com/kubernetes-sigs/testing_frameworks/master/integration/scripts/download-binaries.sh \
+  && chmod +x /tmp/download-binaries.sh \
+  && mkdir -p /usr/local/kubebuilder/bin \
+  && /tmp/download-binaries.sh /usr/local/kubebuilder/bin
+
 COPY scripts/* /usr/local/bin/
 
 #######################################
@@ -60,3 +66,4 @@ RUN apt update \
   && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /usr/local/bin /usr/local/bin
+COPY --from=builder /usr/local/kubebuilder/bin /usr/local/kubebuilder/bin
